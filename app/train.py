@@ -176,8 +176,8 @@ def loss_function(output, target, loss_type = 1):
         weights = target*20+1
         loss = F.binary_cross_entropy(output, target, reduction='none')
         weighted_loss = loss * weights
-        loss_total = loss_iou + torch.sum(weighted_loss)/6
-        return loss_total
+        loss_total = 3*loss_iou + torch.sum(weighted_loss)/3
+        return loss_total/10
     elif loss_type == 3:
         
         intersection = torch.sum(output * target)
@@ -222,9 +222,9 @@ def train(model, n_epochs:int =4,
     patients = [pat for pat in patients if not pat=='LICENSE' and pat not in failed_patients]
 
     train_patients, val_patients = train_val_split(patients, val_split)
-
+    # train_patients, val_patients = ['LIDC-IDRI-0002'], ['LIDC-IDRI-0011']
     # Definir optimizador
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
 
 
     loss_batch = np.array([])
@@ -385,6 +385,7 @@ if __name__=='__main__':
     parser.add_argument('--save_epochs', type=int, default=None)
     parser.add_argument('--model_extension', type=str, default='.pt')
     parser.add_argument('--loss_type', type=int, default=1)
+    parser.add_argument('--dropout_rate', type=float, default=0)
     # Obtener los argumentos proporcionados por el usuario
     args = parser.parse_args()
     checks_alright(args)
@@ -401,11 +402,17 @@ if __name__=='__main__':
     # Descargamos el modelo preentrenado:
     model = UNet(in_channels=1, 
                      out_channels=1, 
-                     init_features=32) # , dropout_rate=0.2)
+                     init_features=32, dropout_rate=args.dropout_rate)
 
     if torch.cuda.is_available():
-        device = torch.device('cuda')
-        model = model.to(device)
+        print('moviendo a la grafica...')
+        try:
+            device = torch.device('cuda')
+            model = model.to(device)
+            print('INFO: Modelo funcionando en la GPU')
+        except:
+            print('WARNING: Hay fallo al trasladar a la grafica, el enrteno ira muy lento.'\
+                  'Soluciones: \n 1. Reinicia el ordenador \n 2. Prueba NVIDIA-SMI')
     
     # Llamar a la función train con los argumentos
     train(model, n_epochs=args.n_epochs, batch_size=args.batch_size, val_split=args.val_split,
