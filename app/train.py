@@ -100,13 +100,13 @@ def plot(data, show=False, path_save=None, name_plot='loss_plot', loss_type=1):
     epoch_val_loss_history = data['epoch_val_loss_history']
     n_epochs = len(epoch_loss_history)
     if loss_type==3:
-        plt.plot(np.linspace(1, n_epochs, np.array(patient_loss_history).shape[0]), np.array(patient_loss_history), '.', alpha=0.2, label='Train Patient Loss')
+        plt.plot(np.linspace(1, n_epochs, np.array(patient_loss_history).shape[0]), np.array(patient_loss_history), '.', alpha=0.04, label='Train Patient Loss')
         plt.plot(np.linspace(1, n_epochs, n_epochs), np.array(epoch_loss_history), label='Train Epoch Loss')
         plt.plot(np.linspace(1, n_epochs, n_epochs), np.array(epoch_val_loss_history), label='Val. Epoch Loss')
         plt.ylabel('loss')
     else:
         #plt.plot(np.linspace(1, n_epochs, np.array(batch_loss_history).shape[0]), np.log(np.array(batch_loss_history)), label='Train Batch Loss')
-        plt.plot(np.linspace(1, n_epochs, np.array(patient_loss_history).shape[0]), np.log(np.array(patient_loss_history)), '.', alpha=0.2,label='Train Patient Loss')
+        plt.plot(np.linspace(1, n_epochs, np.array(patient_loss_history).shape[0]), np.log(np.array(patient_loss_history)), '.', alpha=0.04,label='Train Patient Loss')
         plt.plot(np.linspace(1, n_epochs, n_epochs), np.log(np.array(epoch_loss_history)), label='Train Epoch Loss')
         plt.plot(np.linspace(1, n_epochs, n_epochs), np.log(np.array(epoch_val_loss_history)), label='Val. Epoch Loss')
         plt.yscale("log")
@@ -222,9 +222,9 @@ def train(model, n_epochs:int =4,
     patients = [pat for pat in patients if not pat=='LICENSE' and pat not in failed_patients]
 
     train_patients, val_patients = train_val_split(patients, val_split)
-    # train_patients, val_patients = ['LIDC-IDRI-0002'], ['LIDC-IDRI-0011']
+    # train_patients, val_patients = ['LIDC-IDRI-0002', 'LIDC-IDRI-0013', 'LIDC-IDRI-0129'], ['LIDC-IDRI-0011']
     # Definir optimizador
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.00001)
 
 
     loss_batch = np.array([])
